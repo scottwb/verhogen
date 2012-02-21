@@ -4,6 +4,7 @@
  */
 
 var express = require('express');
+var stylus  = require('stylus');
 var routes  = require('./routes');
 
 var app = module.exports = express.createServer();
@@ -16,6 +17,10 @@ app.configure(function(){
   app.use(express.bodyParser());
   app.use(express.methodOverride());
   app.use(app.router);
+  app.use(stylus.middleware({
+    src      : __dirname + "/public",
+    compress : true
+  }));
   app.use(express.static(__dirname + '/public'));
 });
 
