@@ -37,5 +37,10 @@ app.configure('production', function(){
 
 app.get('/', routes.index);
 
+var things = require('./resources/things');
+app.resource('things', things)
+  .map('get', 'foo', things.foo)
+  .map('get', 'bar', things.bar);
+
 app.listen(3000);
 console.log("Express server listening on port %d in %s mode", app.address().port, app.settings.env);
