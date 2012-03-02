@@ -3,9 +3,10 @@
  * Module dependencies.
  */
 
-var express = require('express');
-var stylus  = require('stylus');
-var routes  = require('./routes');
+var express  = require('express');
+var resource = require('express-resource');
+var stylus   = require('stylus');
+var routes   = require('./routes');
 
 var app = module.exports = express.createServer();
 
