@@ -3,9 +3,10 @@
  * Module dependencies.
  */
 
-var express = require('express');
-var stylus  = require('stylus');
-var routes  = require('./routes');
+var express  = require('express');
+var resource = require('express-resource');
+var stylus   = require('stylus');
+var routes   = require('./routes');
 
 var app = module.exports = express.createServer();
 
@@ -35,6 +36,11 @@ app.configure('production', function(){
 // Routes
 
 app.get('/', routes.index);
+
+var things = require('./resources/things');
+app.resource('things', things)
+  .map('get', 'foo', things.foo)
+  .map('get', 'bar', things.bar);
 
 app.listen(3000);
 console.log("Express server listening on port %d in %s mode", app.address().port, app.settings.env);
