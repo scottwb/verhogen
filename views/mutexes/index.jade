@@ -1,0 +1,8 @@
+h1= title
+ul
+  each mutex in activeMutexes
+    li
+      a(href="/mutexes/#{mutex.uuid()}") #{mutex.name()} (#{mutex.uuid()})
+
+hr
+a(href="/mutexes/new") Create a new mutex

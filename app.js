@@ -44,5 +44,10 @@ app.resource('things', things)
   .map('get', 'foo', things.foo)
   .map('get', 'bar', things.bar);
 
+var mutexes = require('./resources/mutexes');
+app.resource('mutexes', mutexes)
+  .map('post', 'acquire', mutexes.acquire)
+  .map('post', 'release', mutexes.release);
+
 app.listen(3000);
 console.log("Express server listening on port %d in %s mode", app.address().port, app.settings.env);

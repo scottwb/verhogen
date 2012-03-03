@@ -1,0 +1,14 @@
+h1= title
+ul
+  li UUID: #{mutex.uuid()}
+  li Name: #{mutex.name()}
+
+hr
+if mutex.holdingLock()
+  a(href="/mutexes/#{mutex.uuid()}/release", data-method="post", rel="nofollow") Release this mutex
+else
+  a(href="/mutexes/#{mutex.uuid()}/acquire", data-method="post", rel="nofollow") Acquire this mutex
+br
+a(href="/mutexes/#{mutex.uuid()}", data-method="delete", rel="nofollow", data-confirm="Are you sure?") Delete this mutex
+br
+a(href="/mutexes") List active mutexes
