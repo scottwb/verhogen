@@ -3,6 +3,7 @@
  * Module dependencies.
  */
 
+GLOBAL.config   = require('./config');
 var express  = require('express');
 var resource = require('express-resource');
 var stylus   = require('stylus');
