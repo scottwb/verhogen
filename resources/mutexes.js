@@ -98,6 +98,8 @@ _.extend(exports, {
     // Store an indicator of who to respond to when acquire completes.
     req.mutex.response = res;
 
+    res.connection.setTimeout(0);
+
     var onAbandoned = function() {
       req.mutex.abandoned = true;
       req.mutex.response  = null;
