@@ -95,17 +95,45 @@ _.extend(exports, {
   // Member Methods
   ////////////////////////////////////////////////////////////
   acquire: function(req, res) {
-    req.mutex.acquire(0, function() {
-      switch (req.format) {
-      case 'json':
-        res.json({'status' : 'acquired'});
-        break;
-      case 'html':
-      default:
-        res.redirect('/mutexes/' + req.mutex.uuid());
-        break;
+    // Store an indicator of who to respond to when acquire completes.
+    req.mutex.response = res;
+
+    var onAbandoned = function() {
+      req.mutex.abandoned = true;
+      req.mutex.response  = null;
+    };
+    req.on('close', onAbandoned);
+
+    var onAcquired = function() {
+      if (req.mutex.response) {
+        switch (req.format) {
+        case 'json':
+          req.mutex.response.json({'status' : 'acquired'});
+          break;
+        case 'html':
+        default:
+          req.mutex.response.redirect('/mutexes/' + req.mutex.uuid());
+          break;
+        }
+      };
+    };
+
+    // If the mutex was previously abandoned by the client while it was
+    // waiting to be acquired, that means we're picking it back up now.
+    // If it has since been acquired, we can respond with onAcquired() now,
+    // otherwise, we're still waiting and do nothing.
+    //
+    // If it hasn't been abandonded, then this is the first client call
+    // to acquire, so we go ahead and acquire the mutex.
+    if (req.mutex.abandoned) {
+      req.mutex.abandoned = false;
+      if (req.mutex.holdingLock()) {
+        onAcquired();
       }
-    });
+    }
+    else {
+      req.mutex.acquire(0, onAcquired);
+    }
   },
 
   release: function(req, res) {
