@@ -45,7 +45,7 @@ _.extend(exports, {
         switch (req.format) {
 
         case 'json':
-          res.json({id:mutex.uuid()}, 201);
+          res.json({uuid:mutex.uuid()}, 201);
           break;
 
         case 'html':
