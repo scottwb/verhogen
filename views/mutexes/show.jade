@@ -2,6 +2,7 @@ h1= title
 ul
   li UUID: #{mutex.uuid()}
   li Name: #{mutex.name()}
+  li Holding Lock: #{mutex.holdingLock() ? 'true' : 'false'}
   li Abandoned: #{mutex.abandoned ? 'true' : 'false'}
 
 hr
