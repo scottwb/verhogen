@@ -11,7 +11,7 @@ _.extend(exports, {
   index: function(req, res) {
     switch (req.format) {
     case 'json':
-      res.json(_.map(ActiveMutexes, function(uuid, mutex) {
+      res.json(_.map(ActiveMutexes, function(mutex, uuid) {
         return {
           uuid : mutex.uuid(),
           name : mutex.name()
