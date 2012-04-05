@@ -12,10 +12,7 @@ _.extend(exports, {
     switch (req.format) {
     case 'json':
       res.json(_.map(ActiveMutexes, function(mutex, uuid) {
-        return {
-          uuid : mutex.uuid(),
-          name : mutex.name()
-        };
+        return mutex.asJSON();
       }));
       break;
 
@@ -45,13 +42,7 @@ _.extend(exports, {
         switch (req.format) {
 
         case 'json':
-          res.json(
-            {
-              uuid : mutex.uuid(),
-              name : mutex.name()
-            },
-            201
-          );
+          res.json(mutex.asJSON(), 201);
           break;
 
         case 'html':
@@ -83,10 +74,7 @@ _.extend(exports, {
     switch (req.format) {
 
     case 'json':
-      res.json({
-        uuid : req.mutex.uuid(),
-        name : req.mutex.name()
-      });
+      res.json(req.mutex.asJSON());
       break;
 
     case 'html':
