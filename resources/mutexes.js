@@ -154,6 +154,26 @@ _.extend(exports, {
   // Helper Methods
   ////////////////////////////////////////////////////////////
   load: function(req, id, fn) {
-    fn(null, ActiveMutexes[id]);
+    var mutex = ActiveMutexes[id];
+    if (mutex) {
+      fn(null, mutex);
+    }
+    else {
+      switch (req.params.format) {
+      case 'json':
+        req.res.json(
+          {
+            'error'   : 'NotFound',
+            'message' : 'Sorry. The requested mutex instance does not exist.'
+          },
+          404
+        );
+        break;
+      case 'html':
+      default:
+        req.res.send(404);
+        break;
+      }
+    }
   },
 });
