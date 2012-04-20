@@ -1,7 +1,30 @@
 var _     = require('underscore');
 var Mutex = require('../lib/mutex');
 
-var ActiveMutexes = {};
+// Quick-and-dirty in-memory storage for active Mutex instances so that
+// they can maintain their redis connections across requests can be looked
+// up by uuid. This is just a scaffold to provide an API for storing them
+// that we can fill out more robustly later.
+var MutexStore = {
+  _instances : {},
+
+  getAll : function() {
+    return _.values(this._instances);
+  },
+
+  get : function(uuid) {
+    return this._instances[uuid];
+  },
+
+  put : function(mutex) {
+    this._instances[mutex.uuid()] = mutex;
+    return mutex;
+  },
+
+  remove : function(mutex) {
+    delete this._instances[mutex.uuid()];
+  }
+};
 
 _.extend(exports, {
 
@@ -9,18 +32,18 @@ _.extend(exports, {
   // RESTful Methods
   ////////////////////////////////////////////////////////////
   index: function(req, res) {
+    activeMutexes = MutexStore.getAll();
+
     switch (req.format) {
     case 'json':
-      res.json(_.map(ActiveMutexes, function(mutex, uuid) {
-        return mutex.asJSON();
-      }));
+      res.json(_.map(activeMutexes, function(m) {return m.asJSON();}));
       break;
 
     case 'html':
     default:
       res.render('mutexes/index', {
         title         : 'Active Mutexes',
-        activeMutexes : ActiveMutexes
+        activeMutexes : activeMutexes
       });
       break;
     }
@@ -38,7 +61,7 @@ _.extend(exports, {
       port     : config.redis.port,
       password : config.redis.password,
       onReady  : function(mutex) {
-        ActiveMutexes[mutex.uuid()] = mutex;
+        MutexStore.put(mutex);
         switch (req.format) {
 
         case 'json':
@@ -55,8 +78,8 @@ _.extend(exports, {
   },
 
   destroy: function(req, res) {
+    MutexStore.remove(req.mutex);
     req.mutex.destroy();
-    delete ActiveMutexes[req.params.mutex];
 
     switch (req.format) {
     case 'json':
@@ -154,7 +177,7 @@ _.extend(exports, {
   // Helper Methods
   ////////////////////////////////////////////////////////////
   load: function(req, id, fn) {
-    var mutex = ActiveMutexes[id];
+    var mutex = MutexStore.get(id);
     if (mutex) {
       fn(null, mutex);
     }
